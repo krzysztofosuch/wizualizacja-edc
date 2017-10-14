@@ -127,10 +127,7 @@ class Wizualizacja(ShowBase):
             data = self.last_data
             print(e)
 
-        r = requests.get('http://192.168.0.19:5000/singleSteadyRead')
-        #r = requests.get('http://192.168.0.19:5000/singleRead')
-        data = json.loads(r.text)
-        pprint(data)
+        # pprint(data)
 
         labels = {
             0: "X = ",
@@ -185,22 +182,23 @@ class Wizualizacja(ShowBase):
 
         r = requests.get('http://192.168.0.19:5000/singleRead')
         loadedData = json.loads(r.text)
+        for i in range(0,8):
+            self.samples[i].append(loadedData[i])
+
+            if len(self.samples[i]) > 5:
+                del self.samples[i][0]
+
         uart = loadedData[8]
         del loadedData[8]
 
-        self.samples.append(loadedData)
-
-        if len(self.samples) > 5:
-            del self.samples[0]
-
-        data[0] = median([self.samples[0][0], self.samples[0][1], self.samples[0][2], self.samples[0][3], self.samples[0][4]])
-        data[1] = median([self.samples[1][0], self.samples[1][1], self.samples[1][2], self.samples[1][3], self.samples[1][4]])
-        data[2] = median([self.samples[2][0], self.samples[2][1], self.samples[2][2], self.samples[2][3], self.samples[2][4]])
-        data[3] = median([self.samples[3][0], self.samples[3][1], self.samples[3][2], self.samples[3][3], self.samples[3][4]])
-        data[4] = median([self.samples[4][0], self.samples[4][1], self.samples[4][2], self.samples[4][3], self.samples[4][4]])
-        data[5] = median([self.samples[5][0], self.samples[5][1], self.samples[5][2], self.samples[5][3], self.samples[5][4]])
-        data[6] = median([self.samples[6][0], self.samples[6][1], self.samples[6][2], self.samples[6][3], self.samples[6][4]])
-        data[7] = median([self.samples[7][0], self.samples[7][1], self.samples[7][2], self.samples[7][3], self.samples[7][4]])
+        data[0] = median(self.samples[0])
+        data[1] = median(self.samples[1])
+        data[2] = median(self.samples[2])
+        data[3] = median(self.samples[3])
+        data[4] = median(self.samples[4])
+        data[5] = median(self.samples[5])
+        data[6] = median(self.samples[6])
+        data[7] = median(self.samples[7])
         data[8] = uart
         return data
 
