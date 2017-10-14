@@ -144,7 +144,7 @@ class Wizualizacja(ShowBase):
         for x in data:
             if data.index(x) == 8:
                 try:
-                    time_string = "Dzień: " + str(ord(x[1])) + ", " + str(ord(x[2])) + ":" + str(ord(x[3])) + ":" + str(ord(x[4]))
+                    time_string = "Dzień: " + str(ord(x[1])) + ", " + str(ord(x[2])).zfill(2) + ":" + str(ord(x[3])).zfill(2) + ":" + str(ord(x[4])).zfill(2)
                     self.text_lines[data.index(x)].setText(labels[data.index(x)] + str(time_string))
                 except IndexError:
                     self.text_lines[data.index(x)].setText(labels[data.index(x)] + "")
