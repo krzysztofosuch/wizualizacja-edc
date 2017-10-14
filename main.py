@@ -5,6 +5,7 @@ from direct.actor.Actor import Actor
 from direct.interval.IntervalGlobal import Sequence
 from panda3d.core import Point3, CollisionTraverser, CollisionSegment, CollisionHandlerEvent, LineSegs, NodePath
 from math import pi, sin, cos
+from statistics import median
 from pprint import pprint
 import requests
 import json
@@ -14,6 +15,11 @@ class Wizualizacja(ShowBase):
         ShowBase.__init__(self)
         self.taskMgr.add(self.spinCameraTask, "spinCameraTask");
         self.prepareDron()
+        samples = [0] * 9
+        for i in range(0, 9):
+            samples[i] = [0] * 5
+        self.samples = samples
+
         bounds_bottom = LineSegs("bbottom")
         bounds_bottom.set_color(1,0,0)
         bounds_bottom.moveTo(0,0,0)
@@ -87,11 +93,8 @@ class Wizualizacja(ShowBase):
         
     def spinCameraTask(self, task):
         try: 
-            #r = requests.get('http://192.168.0.19:5000/singleSteadyRead')
-            #r = requests.get('http://192.168.0.19:5000/params')
-            r = requests.get('http://192.168.0.19:5000/singleRead')
-            data = json.loads(r.text)
-            #print(data[0], data[1], data[2])
+            data = self.getParams()
+            print(data[3], data[4], data[5])
             self.dronActor.setPos(data[0], data[1], data[2])
             self.dronActor.setHpr(data[5],data[6],data[7])
             dronPos = self.dronActor.getPos();
@@ -128,6 +131,30 @@ class Wizualizacja(ShowBase):
         tHeight = dronePos.getZ()-relativeHeight
         self.terrainLine.drawTo(dronePos.getX(), dronePos.getY(),tHeight)
         NodePath(self.terrainLine.create()).reparentTo(self.render) 
+    def getParams(self):
+        data = [0] * 9
+
+        r = requests.get('http://192.168.0.19:5000/singleRead')
+        loadedData = json.loads(r.text)
+        uart = loadedData[8]
+        del loadedData[8]
+
+        self.samples.append(loadedData)
+
+        if len(self.samples) > 5:
+            del self.samples[0]
+
+        data[0] = median(self.samples[0])
+        data[1] = median(self.samples[1])
+        data[2] = median(self.samples[2])
+        data[3] = median(self.samples[3])
+        data[4] = median(self.samples[4])
+        data[5] = median(self.samples[5])
+        data[6] = median(self.samples[6])
+        data[7] = median(self.samples[7])
+        data[8] = uart
+        return data
+
     def walk(self, direction):
         self.dronWalking = direction
     def stop(self):
