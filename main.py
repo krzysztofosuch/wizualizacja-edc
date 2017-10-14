@@ -10,6 +10,7 @@ import requests
 import json
 class Wizualizacja(ShowBase):
     def __init__(self):
+        self.cameraMode = 0
         ShowBase.__init__(self)
         self.taskMgr.add(self.spinCameraTask, "spinCameraTask");
         self.prepareDron()
@@ -67,34 +68,66 @@ class Wizualizacja(ShowBase):
         NodePath(ground_grid.create()).reparentTo(self.render) 
         
         
+        self.terrainLine = LineSegs("terrainLine")
+        self.terrainLine.set_color(1,1,1)
         #bounds_top.drawTo(0,4096,0)
         #bounds_top.moveTo(0,4096,256)
 
         #bounds_top.reparentTo(self.render) 
-
+        self.accept("space-up", self.changeCamera)
+    def changeCamera(self):
+        self.cameraMode+=1
+        if self.cameraMode > 4:
+            self.cameraMode = 0
     def prepareDron(self):
         self.dronActor = Actor("dron")
-        self.dronActor.setScale(0.05, 0.05, 0.05)
+        self.dronActor.setScale(0.2, 0.2, 0.2)
         self.dronActor.reparentTo(self.render)
         self.dronActor.setPos(2048,2018,128)
         
     def spinCameraTask(self, task):
-        r = requests.get('http://192.168.0.19:5000/singleSteadyRead')
-        #r = requests.get('http://192.168.0.19:5000/singleRead')
-        data = json.loads(r.text)
-        print(data[0], data[1], data[2])
-        self.dronActor.setPos(data[0], data[1], data[2])
-        self.dronActor.setHpr(data[5],data[6],data[7])
-        dronPos = self.dronActor.getPos();
-        angleDegrees = task.time*0.0
-        angle = (task.time*0.0)*(pi/180.0)
+        try: 
+            #r = requests.get('http://192.168.0.19:5000/singleSteadyRead')
+            #r = requests.get('http://192.168.0.19:5000/params')
+            r = requests.get('http://192.168.0.19:5000/singleRead')
+            data = json.loads(r.text)
+            #print(data[0], data[1], data[2])
+            self.dronActor.setPos(data[0], data[1], data[2])
+            self.dronActor.setHpr(data[5],data[6],data[7])
+            dronPos = self.dronActor.getPos();
+            angleDegrees = task.time*0.0
+            angle = (task.time*0.0)*(pi/180.0)
+            self.last_data = data
+        except Exception as e:
+            data = self.last_data
+            print(e)
         #self.camera.setPos(dronPos.getX()+40, dronPos.getY()-40, dronPos.getZ()+3)
         #self.camera.setPos(dronPos.getX()+20*sin(angle), dronPos.getY()-20*cos(angle), dronPos.getZ()+3)
         #self.camera.setPos(dronPos.getX(), dronPos.getY(),280)
-        self.camera.setPos(self.dronActor, 0, 22, 11)
-        self.camera.lookAt(self.dronActor)
+        if self.cameraMode == 0:
+            self.camera.setPos(self.dronActor.getPos())
+            self.camera.setPos(self.camera, 0,10,20)
+            self.camera.lookAt(self.dronActor)
+        elif self.cameraMode == 1:
+            self.camera.setPos(0,0,255)
+            self.camera.lookAt(self.dronActor)
+        elif self.cameraMode == 2:
+            self.camera.setPos(4096,4096,255)
+            self.camera.lookAt(self.dronActor)
+        if self.cameraMode == 3:
+            self.camera.setPos(self.dronActor, 0, 20, 3)
+            self.camera.lookAt(self.dronActor)
+        if self.cameraMode == 4:
+            self.camera.setPos(self.dronActor, 0, 45, 6)
+            self.camera.lookAt(self.dronActor)
         #self.camera.setPos(dronPos.getX(), dronPos.getY(),280)
+        self.drawTerrainLine(data[3])
         return Task.cont
+    def drawTerrainLine(self, relativeHeight):
+        dronePos = self.dronActor.getPos()
+        tHeight = dronePos.getZ()-relativeHeight
+        self.terrainLine.drawTo(dronePos.getX(), dronePos.getY(),tHeight)
+        NodePath(self.terrainLine.create()).reparentTo(self.render) 
     def walk(self, direction):
         self.dronWalking = direction
     def stop(self):
