@@ -14,6 +14,11 @@ class Wizualizacja(ShowBase):
         ShowBase.__init__(self)
         self.taskMgr.add(self.spinCameraTask, "spinCameraTask");
         self.prepareDron()
+        samples = [0] * 9
+        for i in range(0, 9):
+            samples[i] = [0] * 5
+        self.samples = samples
+
         bounds_bottom = LineSegs("bbottom")
         bounds_bottom.set_color(1,0,0)
         bounds_bottom.moveTo(0,0,0)
@@ -95,32 +100,27 @@ class Wizualizacja(ShowBase):
         #self.camera.setPos(dronPos.getX(), dronPos.getY(),280)
         return Task.cont
     def getParams(self):
-        perMedianaSamples = 10
-        samples = [0] * 9
         data = [0] * 9
 
-        for i in range(0, perMedianaSamples):
-            r = requests.get('http://192.168.0.19:5000/singleRead')
-            loadedData = json.loads(r.text)
-            samples[i][0] = loadedData[0]
-            samples[i][1] = loadedData[1]
-            samples[i][2] = loadedData[2]
-            samples[i][3] = loadedData[3]
-            samples[i][4] = loadedData[4]
-            samples[i][5] = loadedData[5]
-            samples[i][6] = loadedData[6]
-            samples[i][7] = loadedData[7]
-            samples[i][8] = loadedData[8]
+        r = requests.get('http://192.168.0.19:5000/singleRead')
+        loadedData = json.loads(r.text)
+        uart = loadedData[8]
+        del loadedData[8]
 
-        data[0] = median(samples[0])
-        data[1] = median(samples[1])
-        data[2] = median(samples[2])
-        data[3] = median(samples[3])
-        data[4] = median(samples[4])
-        data[5] = median(samples[5])
-        data[6] = median(samples[6])
-        data[7] = median(samples[7])
-        data[8] = samples[8][0]
+        self.samples.append(loadedData)
+
+        if len(self.samples) > 5:
+            del self.samples[0]
+
+        data[0] = median(self.samples[0])
+        data[1] = median(self.samples[1])
+        data[2] = median(self.samples[2])
+        data[3] = median(self.samples[3])
+        data[4] = median(self.samples[4])
+        data[5] = median(self.samples[5])
+        data[6] = median(self.samples[6])
+        data[7] = median(self.samples[7])
+        data[8] = uart
         return data
 
     def walk(self, direction):
