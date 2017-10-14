@@ -22,15 +22,15 @@ class Wizualizacja(ShowBase):
         self.samples = samples
 
         self.text_lines = {
-                0: OnscreenText(text = str(0.0),pos = (-1.2,0.9),scale = .05,fg=(1,1,1,1),align=TextNode.ALeft,mayChange=1),
-                1: OnscreenText(text = str(0.0),pos = (-1.2,0.8),scale = .05,fg=(1,1,1,1),align=TextNode.ALeft,mayChange=1),
-                2: OnscreenText(text = str(0.0),pos = (-1.2,0.7),scale = .05,fg=(1,1,1,1),align=TextNode.ALeft,mayChange=1),
-                3: OnscreenText(text = str(0.0),pos = (-1.2,0.6),scale = .05,fg=(1,1,1,1),align=TextNode.ALeft,mayChange=1),
-                4: OnscreenText(text = str(0.0),pos = (-1.2,0.5),scale = .05,fg=(1,1,1,1),align=TextNode.ALeft,mayChange=1),
-                5: OnscreenText(text = str(0.0),pos = (-1.2,0.4),scale = .05,fg=(1,1,1,1),align=TextNode.ALeft,mayChange=1),
-                6: OnscreenText(text = str(0.0),pos = (-1.2,0.3),scale = .05,fg=(1,1,1,1),align=TextNode.ALeft,mayChange=1),
-                7: OnscreenText(text = str(0.0),pos = (-1.2,0.2),scale = .05,fg=(1,1,1,1),align=TextNode.ALeft,mayChange=1),
-                8: OnscreenText(text = str(0.0),pos = (-1.2,0.1),scale = .05,fg=(1,1,1,1),align=TextNode.ALeft,mayChange=1)
+                0: OnscreenText(text = str(0.0),pos = (-1.6,0.9),scale = .05,fg=(1,1,1,1),align=TextNode.ALeft,mayChange=1),
+                1: OnscreenText(text = str(0.0),pos = (-1.6,0.8),scale = .05,fg=(1,1,1,1),align=TextNode.ALeft,mayChange=1),
+                2: OnscreenText(text = str(0.0),pos = (-1.6,0.7),scale = .05,fg=(1,1,1,1),align=TextNode.ALeft,mayChange=1),
+                3: OnscreenText(text = str(0.0),pos = (-1.6,0.6),scale = .05,fg=(1,1,1,1),align=TextNode.ALeft,mayChange=1),
+                4: OnscreenText(text = str(0.0),pos = (-1.6,0.5),scale = .05,fg=(1,1,1,1),align=TextNode.ALeft,mayChange=1),
+                5: OnscreenText(text = str(0.0),pos = (-1.6,0.4),scale = .05,fg=(1,1,1,1),align=TextNode.ALeft,mayChange=1),
+                6: OnscreenText(text = str(0.0),pos = (-1.6,0.3),scale = .05,fg=(1,1,1,1),align=TextNode.ALeft,mayChange=1),
+                7: OnscreenText(text = str(0.0),pos = (-1.6,0.2),scale = .05,fg=(1,1,1,1),align=TextNode.ALeft,mayChange=1),
+                8: OnscreenText(text = str(0.0),pos = (-1.6,0.1),scale = .05,fg=(1,1,1,1),align=TextNode.ALeft,mayChange=1)
             }
 
         bounds_bottom = LineSegs("bbottom")
@@ -143,8 +143,11 @@ class Wizualizacja(ShowBase):
 
         for x in data:
             if data.index(x) == 8:
-                time_string = "Dzień: " + str(ord(x[1])) + ", " + str(ord(x[2])) + ":" + str(ord(x[3])) + ":" + str(ord(x[4]))
-                self.text_lines[data.index(x)].setText(labels[data.index(x)] + str(time_string))
+                try:
+                    time_string = "Dzień: " + str(ord(x[1])) + ", " + str(ord(x[2])) + ":" + str(ord(x[3])) + ":" + str(ord(x[4]))
+                    self.text_lines[data.index(x)].setText(labels[data.index(x)] + str(time_string))
+                except IndexError:
+                    self.text_lines[data.index(x)].setText(labels[data.index(x)] + "")
             else:
                 self.text_lines[data.index(x)].setText(labels[data.index(x)] + str(x))
 
