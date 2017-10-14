@@ -149,7 +149,7 @@ class Wizualizacja(ShowBase):
                 except IndexError:
                     self.text_lines[data.index(x)].setText(labels[data.index(x)] + "")
             else:
-                self.text_lines[data.index(x)].setText(labels[data.index(x)] + str(x))
+                self.text_lines[data.index(x)].setText(labels[data.index(x)] + str(float("{:10.3f}".format(x))))
 
         # print(data[0], data[1], data[2])
         self.dronActor.setPos(data[0], data[1], data[2])
