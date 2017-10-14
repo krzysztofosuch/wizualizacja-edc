@@ -36,7 +36,7 @@ class Wizualizacja(ShowBase):
         bounds_mid.drawTo(0,0,2*256/3)
         NodePath(bounds_mid.create()).reparentTo(self.render) 
         bounds_top = LineSegs("btop")
-
+        
 
         bounds_top.set_color(1,0,0)
         bounds_top.moveTo(0,0,256)
@@ -65,18 +65,19 @@ class Wizualizacja(ShowBase):
             ground_grid.moveTo(x*32,0,0)
             ground_grid.drawTo(x*32,4096,0)
         NodePath(ground_grid.create()).reparentTo(self.render) 
+        
+        
         #bounds_top.drawTo(0,4096,0)
         #bounds_top.moveTo(0,4096,256)
 
         #bounds_top.reparentTo(self.render) 
 
     def prepareDron(self):
-        self.droneTexture = loader.loadTexture("./6-01.jpg")
         self.dronActor = Actor("dron")
-        self.dronActor.setScale(0.5, 0.5, 0.5)
-        self.dronActor.setTexture(self.droneTexture)
+        self.dronActor.setScale(0.05, 0.05, 0.05)
         self.dronActor.reparentTo(self.render)
         self.dronActor.setPos(2048,2018,128)
+        
     def spinCameraTask(self, task):
         r = requests.get('http://192.168.0.19:5000/singleSteadyRead')
         #r = requests.get('http://192.168.0.19:5000/singleRead')
@@ -90,7 +91,7 @@ class Wizualizacja(ShowBase):
         #self.camera.setPos(dronPos.getX()+40, dronPos.getY()-40, dronPos.getZ()+3)
         #self.camera.setPos(dronPos.getX()+20*sin(angle), dronPos.getY()-20*cos(angle), dronPos.getZ()+3)
         #self.camera.setPos(dronPos.getX(), dronPos.getY(),280)
-        self.camera.setPos(self.dronActor, 0, 20, 10)
+        self.camera.setPos(self.dronActor, 0, 22, 11)
         self.camera.lookAt(self.dronActor)
         #self.camera.setPos(dronPos.getX(), dronPos.getY(),280)
         return Task.cont
